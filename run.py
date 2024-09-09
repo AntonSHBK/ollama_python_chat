@@ -59,7 +59,10 @@ if __name__ == "__main__":
     runner = ModelRunner()
 
     # Пример использования метода query (чат)
-    prompt = "Why is the sky blue?"
+    prompt = """
+        Есть текст. Напиши адресс если он есть в тексте. Формате -  для поиска в поисковой системы Яндекс.
+        А фотка то хорошая на улице ленина валдбериз как всегда. Шебекинский вайб просто супер.
+    """
     # chat_response = runner.query(prompt)
     # print(f"Chat Response: {chat_response}")
 
