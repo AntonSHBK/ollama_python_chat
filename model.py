@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 import ollama
 
@@ -9,24 +10,18 @@ class BaseModelRunner:
     Описывает базовую модель и методы для взаимодействия с ней, такие как генерация текста.
     """
 
-    def __init__(self):
+    def __init__(self, model_name='llama3.1', model_dir=os.getcwd()):
         """
         Инициализация объекта BaseModelRunner.
 
-        Загружает переменные окружения из файла .env и устанавливает имя модели и директорию сохранения моделей.
+        Устанавливает имя модели и директорию сохранения моделей.
         """
-        # Загружаем переменные окружения из файла .env
-        load_dotenv()
+        # Устанавливаем переменные OLLAMA_MODELS в системные переменные среды
+        self.model_name = model_name
+        self.model_dir = model_dir
 
-        # Получаем имя модели и путь для сохранения моделей из переменных окружения
-        self.model_name = os.getenv('MODEL_NAME')
-        self.model_dir = os.getenv('OLLAMA_MODELS')
-
-        # Устанавливаем переменную OLLAMA_MODELS в системные переменные среды
-        if self.model_dir:
-            os.environ['OLLAMA_MODELS'] = self.model_dir
-            print(f"Model directory set to: {self.model_dir}")
-
+        os.environ['OLLAMA_MODELS'] = self.model_dir
+        print(f"Model directory set to: {self.model_dir}")
         print(f"Model '{self.model_name}' is ready to use.")
 
     def generate(self, prompt: str) -> str:
@@ -50,11 +45,11 @@ class ChatModelRunner(BaseModelRunner):
     Наследует функциональность из BaseModelRunner и добавляет чат с сохранением истории сообщений.
     """
 
-    def __init__(self):
+    def __init__(self, model_name='llama3.1', model_dir=os.getcwd()):
         """
         Инициализация объекта ChatModelRunner.
         """
-        super().__init__()  # Инициализируем родительский класс
+        super().__init__(model_name, model_dir)  # Инициализируем родительский класс
         self.chat_history = []  # Хранение истории чата
 
     def add_message(self, role: str, content: str):
@@ -97,25 +92,13 @@ class ChatModelRunner(BaseModelRunner):
         print("История чата сброшена.")
 
 
-# Пример использования классов:
 if __name__ == "__main__":
-    # Использование базовой модели
-    base_runner = BaseModelRunner()
-    prompt = "Напиши краткое описание модели Ollama."
+    load_dotenv()
+
+    model_name = os.getenv('MODEL_NAME', 'llama3.1')
+    model_dir = os.getenv('OLLAMA_MODELS', os.getcwd())
+    
+    base_runner = BaseModelRunner(model_name=model_name, model_dir=model_dir)
+    prompt = "Напиши краткое описание модели llama 3.1."
     base_response = base_runner.generate(prompt)
     print(f"Base Model Response: {base_response}")
-
-    # # Использование модели в режиме чата
-    # chat_runner = ChatModelRunner()
-
-    # # Ведение чата с моделью
-    # chat_prompt_1 = "Привет, как тебя зовут?"
-    # chat_response_1 = chat_runner.send_message(chat_prompt_1)
-    # print(f"Chat Response 1: {chat_response_1}")
-
-    # chat_prompt_2 = "Что ты можешь рассказать о себе?"
-    # chat_response_2 = chat_runner.send_message(chat_prompt_2)
-    # print(f"Chat Response 2: {chat_response_2}")
-
-    # # Сброс чата
-    # chat_runner.reset_chat()
